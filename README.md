@@ -1,76 +1,81 @@
 <div align="center">
 
-![Marcelo Naucapoma — Systems Engineer](./assets/profile-banner.svg)
+![Marcelo Naucapoma — Systems Engineering, Automation & Integrations](./assets/profile-banner.svg)
 
-**Systems Engineer · Automation & Integrations · Digital Transformation**
+# Hi, I'm Marcelo Naucapoma 👋
 
-Based in Lima, Peru · Building practical technology for real operational challenges
+**Systems Engineer · Automation · API Integrations · Digital Solutions**
 
-[![GitHub](https://img.shields.io/badge/Explore-Projects-1e293b?style=flat-square&logo=github&logoColor=white)](https://github.com/MNR05?tab=repositories)
-[![Email](https://img.shields.io/badge/Contact-Email-0e7490?style=flat-square&logo=gmail&logoColor=white)](mailto:mnr052001@gmail.com)
+*Building practical solutions that simplify processes and connect systems.*
+
+📍 Lima, Peru · [Explore my repositories](https://github.com/MNR05?tab=repositories) · [Contact me](mailto:mnr052001@gmail.com)
 
 </div>
-
-## Hello, I'm Marcelo 👋
-
-I am a **Systems Engineer** focused on turning fragmented processes and manual tasks into reliable digital workflows. I combine software development, data design, API integrations and low-code/no-code platforms to build solutions that are useful, maintainable and measurable.
-
-I coordinate technical work in a **Center of Excellence (COE)** focused on administrative digital transformation, collaborating with stakeholders to translate operational needs into working applications.
-
-> **My approach:** Understand the process → design the solution → automate and integrate → measure outcomes → improve continuously.
-
-## What I work on
-
-- **Process automation:** workflows, approvals, notifications and operational traceability.
-- **Systems integration:** REST APIs, data synchronization and orchestrated services.
-- **Internal applications:** low-code platforms and custom web solutions for business teams.
-- **Data & engineering:** relational databases, reporting, monitoring and technical documentation.
-
-## Toolbox
-
-| Focus | Tools & technologies |
-| :--- | :--- |
-| **Languages & backend** | JavaScript, Node.js, Python, C#, SQL |
-| **Data** | PostgreSQL, SQL Server, NocoDB |
-| **Automation & low-code** | n8n, NocoBase, Kissflow |
-| **Infrastructure & delivery** | Docker, AWS, Vercel, Git / GitHub |
-| **Engineering practices** | REST APIs, process mapping, technical documentation, KPIs |
-
-*These are technologies I use or have worked with; they are not intended as a proficiency ranking.*
-
-## Selected public projects
-
-### 🌱 [ESP8266 IoT monitoring prototype](https://github.com/MNR05/System-of-monitoring-crops-with-EP8266)
-Sensor-data and telemetry prototype using **ESP8266**, Arduino/C++ and Azure IoT Central integration code. Explores temperature, humidity, moisture, light and smoke readings.
-
-### 🧾 [Desktop sales management system](https://github.com/MNR05/Sistema-de-venta-Licoreria)
-Academic desktop application built with **C# and SQL Server**, organized into data, business and entity layers. Includes modules for product, user and role management.
-
-### 🌐 [Jutmay multi-page website](https://github.com/MNR05/PW_Jutmay)
-Web project with multiple pages and landing pages, using **HTML, CSS and JavaScript**.
-
-### 🎮 [MedievalGame](https://github.com/MNR05/MedievalGame)
-**Unity / C#** game project with a medieval setting, NPC-guided missions, collectible coins and enemy avoidance.
-
-[**→ See project notes and repository details**](./docs/PROJECTS.md)
-
-## Current professional interests
-
-- Scalable automation and governance for low-code solutions
-- Integration patterns, data quality and system observability
-- Applied AI and machine learning for practical engineering problems
-- Clear documentation, maintainable systems and measurable improvements
-
-> Some professional projects involve internal systems and are not published here. The repositories above are public examples of my technical work, including academic and experimental projects.
-
-## Let's connect
-
-I enjoy discussing automation, engineering challenges and ways to make technology more useful for teams.
-
-**Email:** [mnr052001@gmail.com](mailto:mnr052001@gmail.com) · **Repositories:** [github.com/MNR05](https://github.com/MNR05)
 
 ---
 
+### 👨‍💻 About me
+
+I'm a **Systems Engineer** focused on software development, process automation and digital solutions. I design and coordinate initiatives that connect applications, improve workflows and make data easier to manage.
+
+My work combines **technical implementation** with a practical approach to requirements, processes, documentation and continuous improvement.
+
+**En español:** Soy ingeniero de sistemas especializado en automatización, integraciones y desarrollo de soluciones digitales. Me interesa construir tecnología útil, escalable y fácil de mantener.
+
+### ⚡ What I do
+
+- **Automation:** turn repetitive tasks into traceable workflows with n8n and low-code tools.
+- **Integrations:** connect applications and services using REST APIs, webhooks and data pipelines.
+- **Application development:** create internal tools, web interfaces and backend services.
+- **Data & architecture:** model relational databases, structure information and document solutions.
+- **Technical coordination:** translate needs into actionable requirements, track progress and improve delivery.
+
+### 🧰 Tech stack
+
 <div align="center">
-  <sub>Built with clarity, curiosity and a focus on real-world impact.</sub>
+
+![JavaScript](https://img.shields.io/badge/JavaScript-1f2937?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
+![Node.js](https://img.shields.io/badge/Node.js-1f2937?style=for-the-badge&logo=nodedotjs&logoColor=5FA04E)
+![Python](https://img.shields.io/badge/Python-1f2937?style=for-the-badge&logo=python&logoColor=3776AB)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-1f2937?style=for-the-badge&logo=postgresql&logoColor=4169E1)
+![Docker](https://img.shields.io/badge/Docker-1f2937?style=for-the-badge&logo=docker&logoColor=2496ED)
+![AWS](https://img.shields.io/badge/AWS-1f2937?style=for-the-badge&logo=amazonwebservices&logoColor=FF9900)
+
 </div>
+
+| Area | Tools & practices |
+| --- | --- |
+| **Automation & low-code** | n8n · NocoBase · NocoDB · Kissflow |
+| **Backend & integrations** | Node.js · Python · REST APIs · Webhooks |
+| **Data** | PostgreSQL · SQL Server · SQL |
+| **Development** | JavaScript · C# · HTML · CSS |
+| **Infrastructure** | Docker · AWS · Vercel · Git / GitHub |
+| **Engineering** | Process mapping · Requirements · Documentation · KPIs |
+
+### 🚀 Featured public projects
+
+| Project | Description | Technologies |
+| --- | --- | --- |
+| **[IoT Monitoring Prototype](https://github.com/MNR05/System-of-monitoring-crops-with-EP8266)** | Sensor readings and telemetry exploration using an ESP8266 microcontroller. | ESP8266 · Arduino/C++ · Azure IoT |
+| **[Sales Management System](https://github.com/MNR05/Sistema-de-venta-Licoreria)** | Academic desktop application with layered architecture for products, users and roles. | C# · SQL Server |
+| **[Multi-page Website](https://github.com/MNR05/PW_Jutmay)** | Website with multiple service pages and landing pages. | HTML · CSS · JavaScript |
+| **[MedievalGame](https://github.com/MNR05/MedievalGame)** | Experimental medieval-themed game with missions, NPCs and collectibles. | Unity · C# |
+
+📚 [Read the technical project overview](./docs/PROJECTS.md)
+
+### 🎯 Currently exploring
+
+- Scalable automation and low-code application development
+- Integration architecture, API orchestration and database design
+- AI-assisted workflows and applied machine learning
+- Reliable documentation, monitoring and continuous improvement
+
+### 🤝 Let's connect
+
+I enjoy collaborating on engineering, software and automation challenges.
+
+**[Email me](mailto:mnr052001@gmail.com)** · **[GitHub Projects](https://github.com/MNR05?tab=repositories)**
+
+---
+
+<div align="center"><sub>Engineering useful solutions, one improvement at a time.</sub></div>
