@@ -2,7 +2,7 @@
   "name": "eventflow-qr-portfolio",
   "version": "0.1.0",
   "private": true,
-  "description": "Generic Vercel + n8n + NocoBase QR event registration starter",
+  "description": "Generic Vercel + n8n + PostgreSQL QR event registration starter",
   "scripts": {
     "start": "vercel dev"
   },
