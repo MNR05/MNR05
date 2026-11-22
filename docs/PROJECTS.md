@@ -11,10 +11,10 @@ This document helps readers understand the public repositories featured on my [G
 **What it demonstrates**
 - A clean, independently rewritten registration and check-in flow using Vercel functions.
 - Random QR ticket tokens, staff-controlled access, and a browser camera scanner with manual fallback.
-- n8n workflow templates with NocoBase collection API interactions.
+- n8n workflow templates using native PostgreSQL queries and atomic database constraints.
 - A privacy-first configuration model that excludes personal data and institutional integrations.
 
-**Status:** Portfolio code starter. Requires configuration and end-to-end testing with a separate n8n and NocoBase instance; not yet a deployed public service.
+**Status:** Portfolio code starter. Requires configuration and end-to-end testing with a separate n8n and PostgreSQL database; not yet a deployed public service.
 
 **Read more:** [Project README](../projects/eventflow-qr/README.md) · [Setup and security notes](../projects/eventflow-qr/docs/SETUP.md)
 
