@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1729">
+  <meta name="description" content="EventFlow QR — an independent demonstration of event registration and QR check-in.">
+  <title>EventFlow QR | Event registration and check-in</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar"><a href="/" class="brand"><span class="brand-icon">EF</span> EventFlow <span class="accent">QR</span></a><span class="topnote">Open portfolio starter · Demo configuration</span></header>
+    <section class="hero">
+      <div class="eyebrow">EVENT OPERATIONS, SIMPLIFIED</div>
+      <h1>Registration to check-in.<br><span>One connected flow.</span></h1>
+      <p>QR tickets, faster admission and structured attendance data. A reusable demonstration built with Vercel, n8n and NocoBase.</p>
+      <div class="pillrow"><span>Vercel</span><span>n8n</span><span>NocoBase</span><span>QR</span></div>
+    </section>
+    <section class="panels" aria-label="Registration and check-in">
+      <article class="panel">
+        <div class="step">01 / ATTENDEE</div>
+        <h2>Register for an event</h2>
+        <p class="muted">Enter fictitious test information only. The configured API is required to register a real test ticket.</p>
+        <form id="register-form">
+          <label>Event ID <input name="eventId" required maxlength="64" pattern="[A-Za-z0-9_-]{2,64}" value="DEMO-2026" autocomplete="off"></label>
+          <label>Full name <input name="name" required maxlength="120" placeholder="Alex Rivera" autocomplete="name"></label>
+          <label>Email address <input name="email" required type="email" maxlength="254" placeholder="alex@example.org" autocomplete="email"></label>
+          <label class="consent"><input name="consent" type="checkbox" required> I consent to storing these test details for this event.</label>
+          <button type="submit">Generate my QR ticket <span aria-hidden="true">→</span></button>
+        </form>
+        <div id="register-status" class="status" role="status" aria-live="polite"></div>
+        <section id="ticket-card" class="ticket hidden" aria-label="Your ticket">
+          <img id="ticket-image" src="" alt="QR ticket generated for your event">
+          <p class="ticket-label">Ticket token</p><code id="ticket-token"></code>
+          <p class="muted">Keep this token private. Present the QR to check in.</p>
+        </section>
+      </article>
+      <article class="panel">
+        <div class="step">02 / EVENT STAFF</div>
+        <h2>Check in a participant</h2>
+        <p class="muted">A staff token is required by the server. Camera scanning works only in compatible secure browsers.</p>
+        <form id="checkin-form">
+          <label>Event ID <input name="eventId" value="DEMO-2026" required maxlength="64" pattern="[A-Za-z0-9_-]{2,64}"></label>
+          <label>Staff access token <input name="staffKey" type="password" required autocomplete="off" placeholder="Server-configured staff key"></label>
+          <label>QR token / manual entry <input id="checkin-ticket" name="ticket" required maxlength="100" placeholder="Ticket UUID" autocomplete="off"></label>
+          <button type="submit" class="secondary">Confirm check-in <span aria-hidden="true">✓</span></button>
+        </form>
+        <div class="camera-actions"><button id="scan-toggle" type="button" class="ghost">Start QR camera scanner</button><span class="muted">Manual token entry always available</span></div>
+        <video id="scan-video" class="hidden" playsinline muted aria-label="Live QR scanner camera"></video>
+        <div id="checkin-status" class="status" role="status" aria-live="polite"></div>
+      </article>
+    </section>
+    <footer>This is a portfolio starter, not a deployed service. <a href="https://github.com/MNR05/MNR05/tree/main/projects/eventflow-qr">View source and setup</a>.</footer>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
