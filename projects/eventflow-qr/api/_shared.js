@@ -14,10 +14,10 @@ export function matchSecret(expected,provided){
   return a.length===b.length&&timingSafeEqual(a,b);
 }
 export async function sendWorkflow(url,data){
-  if(!url||!/^https:\/\//.test(url))throw new Error("Workflow endpoint is not configured with HTTPS.");
+  if(!url||!/^https:\/\//.test(url)||!process.env.N8N_WEBHOOK_SHARED_KEY||process.env.N8N_WEBHOOK_SHARED_KEY.length<24)throw new Error("Workflow endpoint and webhook authentication must use HTTPS and be configured.");
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12000);
   try{
-    const reply=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data),signal:controller.signal});
+    const reply=await fetch(url,{method:"POST",headers:{"content-type":"application/json","x-eventflow-secret":String(process.env.N8N_WEBHOOK_SHARED_KEY)},body:JSON.stringify(data),signal:controller.signal});
     let result={};try{result=await reply.json()}catch{}
     if(!reply.ok||result.ok===false){
       const e=new Error(result.message||"Workflow rejected the request.");
