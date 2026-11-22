@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-labelledby="title desc">
+  <title id="title">Marcelo Naucapoma — Systems Engineering</title>
+  <desc id="desc">Professional banner focused on automation, integrations and digital transformation.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#091325"/>
+      <stop offset="55%" stop-color="#10253b"/>
+      <stop offset="100%" stop-color="#092d37"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#cbd5e1" stroke-opacity=".07" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="320" rx="22" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="22" fill="url(#grid)"/>
+  <circle cx="1120" cy="42" r="200" fill="#38bdf8" fill-opacity=".045"/>
+  <circle cx="1120" cy="42" r="134" stroke="#22d3ee" stroke-opacity=".13" fill="none"/>
+  <path d="M74 58H210" stroke="url(#line)" stroke-width="5" stroke-linecap="round"/>
+  <text x="72" y="125" font-family="Arial, Helvetica, sans-serif" font-size="57" font-weight="700" letter-spacing="1.2" fill="#f8fafc">MARCELO NAUCAPOMA</text>
+  <text x="74" y="172" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="500" fill="#a5d8f5">SYSTEMS ENGINEER  /  DIGITAL TRANSFORMATION</text>
+  <text x="74" y="214" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#d9e6f1">Designing practical software, workflows and integrations.</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="600">
+    <rect x="74" y="243" width="150" height="38" rx="19" fill="#0e7490" fill-opacity=".27" stroke="#22d3ee" stroke-opacity=".5"/>
+    <text x="98" y="268" fill="#a5f3fc">AUTOMATION</text>
+    <rect x="238" y="243" width="142" height="38" rx="19" fill="#1d4ed8" fill-opacity=".2" stroke="#60a5fa" stroke-opacity=".45"/>
+    <text x="262" y="268" fill="#bfdbfe">INTEGRATION</text>
+    <rect x="394" y="243" width="124" height="38" rx="19" fill="#0f766e" fill-opacity=".2" stroke="#5eead4" stroke-opacity=".45"/>
+    <text x="418" y="268" fill="#99f6e4">LOW-CODE</text>
+  </g>
+  <g stroke="url(#line)" fill="none" stroke-width="3" opacity=".7">
+    <path d="M932 91H1062V151H1162M1046 211H936V151H872"/>
+    <path d="M1062 151V240"/>
+  </g>
+  <g fill="#0b1e30" stroke="#53d6ea" stroke-opacity=".65" stroke-width="2">
+    <rect x="886" y="67" rx="14" width="92" height="48"/>
+    <rect x="1114" y="127" rx="14" width="95" height="48"/>
+    <rect x="889" y="187" rx="14" width="105" height="48"/>
+    <circle cx="1062" cy="151" r="27"/>
+    <circle cx="1062" cy="240" r="8" fill="#22d3ee"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#c8eaf2" text-anchor="middle">
+    <text x="932" y="96">DATA</text><text x="1161" y="156">APIs</text>
+    <text x="941" y="216">FLOWS</text><text x="1062" y="156" font-size="24">↔</text>
+  </g>
+</svg>
