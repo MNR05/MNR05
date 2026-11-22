@@ -41,11 +41,12 @@ Add a **unique database constraint on (`eventId`, `qrToken`)** so a ticket canno
 ## n8n
 
 1. Import `n8n/register.json` and `n8n/checkin.json` in your **own test n8n instance**.
-2. Set server variable `NOCOBASE_URL` to the origin of your **test** NocoBase instance, without a trailing slash.
-3. Create an **HTTP Bearer Auth** credential for a dedicated, least-privileged NocoBase API key. Assign the credential to both HTTP Request nodes.
-4. Verify the API key role can only create/list the intended collections and cannot access other records. A role-specific header may be required by your setup.
-5. Activate the webhooks only after tests. Record the production URLs as Vercel environment variables (never check them into Git).
-6. Check the API response shapes on your NocoBase version. The example expects `{data:[...]}` from list and `{data:{...}}` from create.
+2. In each n8n **Webhook** node, set **Header Auth** and attach a dedicated Header Auth credential: name `x-eventflow-secret`, value equal to the Vercel `N8N_WEBHOOK_SHARED_KEY`. This prevents direct unauthenticated calls to n8n even if a webhook URL is exposed. Never commit the credential value.
+3. Set server variable `NOCOBASE_URL` to the origin of your **test** NocoBase instance, without a trailing slash.
+4. Create an **HTTP Bearer Auth** credential for a dedicated, least-privileged NocoBase API key. Assign the credential to both HTTP Request nodes.
+5. Verify the API key role can only create/list the intended collections and cannot access other records. A role-specific header may be required by your setup.
+6. Activate the webhooks only after tests. Record the production URLs as Vercel environment variables (never check them into Git).
+7. Check the API response shapes on your NocoBase version. The example expects `{data:[...]}` from list and `{data:{...}}` from create.
 
 NocoBase API patterns used here:
 - `POST /api/eventflow_registrations:create`
@@ -61,6 +62,7 @@ Set these **server-side** variables:
 - `N8N_REGISTER_WEBHOOK_URL`: full registered n8n webhook URL.
 - `N8N_CHECKIN_WEBHOOK_URL`: full check-in n8n webhook URL.
 - `CHECKIN_ADMIN_TOKEN`: long random secret supplied to staff through an appropriate secure channel.
+- `N8N_WEBHOOK_SHARED_KEY`: a different strong secret, sent only from Vercel to both authenticated n8n webhooks.
 
 The QR endpoint creates an SVG from a token with the `qrcode` npm dependency; it does not contact a third-party QR service.
 
@@ -74,6 +76,7 @@ Deploy this folder as a **separate Vercel project root**, not the entire GitHub 
 - [ ] Check QR token contains no PII.
 - [ ] Scan QR with camera over HTTPS and with manual fallback.
 - [ ] Check-in requires valid staff key.
+- [ ] Both n8n webhooks reject direct calls without the dedicated authentication header.
 - [ ] Reject a ticket from a different event.
 - [ ] Reject second check-in under concurrent requests.
 - [ ] Confirm API keys are unavailable in browser/network assets.
