@@ -1,89 +1,100 @@
 # EventFlow QR
-### Generic event registration and QR check-in starter
 
-**Stack:** n8n · Vercel Functions · NocoBase REST API · JavaScript · QR codes
+**Event registration & QR check-in with Vercel, n8n and PostgreSQL**
 
-EventFlow QR is a **public, independently rewritten portfolio starter** inspired by experience building event registration and attendance automation. It is **not a copy of any private production system**, does not include third-party data and is not presented as an audited production deployment.
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![n8n](https://img.shields.io/badge/n8n-FF6D5A?logo=n8n&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-111827?logo=vercel&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-111827?logo=javascript&logoColor=F7DF1E)
 
-> **Status: demo/source template.** The frontend and serverless endpoints are provided as source; n8n workflows and NocoBase collections still require configuration and an end-to-end test before live use.
+EventFlow QR is an **independently rewritten portfolio starter** for event sign-ups, unique QR tickets and attendance control. It is presented as a general-purpose demonstration using fictional events, without referencing or reproducing any non-public institution or its production infrastructure.
+
+> **Status:** source and importable templates. Configuration and end-to-end testing remain required. No public Vercel deployment or PostgreSQL database has been provisioned by this repository.
 
 ## Features
 
-- Event sign-up using a compact form and explicit consent.
-- Unique random ticket identifier generated server-side.
-- QR image generated from the ticket token only (no name, email or ID inside QR).
-- Operator check-in with a protected API proxy, camera scanning when supported, and manual entry fallback.
-- Registration and attendance flows orchestrated in n8n.
-- Data persisted through the NocoBase REST API.
-- Modular structure and secrets kept outside the repository.
+- Responsive sign-up and staff check-in interfaces.
+- Server-generated UUID QR tokens, excluding names and email from QR payloads.
+- Camera QR scanning where supported and a manual ticket fallback.
+- Vercel API functions proxy requests to protected n8n webhooks.
+- Two n8n workflows using native **Postgres Execute Query** nodes.
+- PostgreSQL database schema with foreign keys, unique indexes and race-safe writes.
+- Explicit responses for unknown events, duplicate registrations, repeated check-ins and invalid tickets.
+- Configuration through environment variables and n8n's credential manager, without publishing secrets.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  A[Attendee] --> B[Vercel frontend]
+  A[Event attendee] --> B[Vercel frontend]
   B --> C[Vercel API functions]
-  C --> D[n8n registration webhook]
-  D --> E[(NocoBase collections)]
-  C --> F[QR image]
-  G[Staff scanner] --> C
-  C --> H[n8n check-in webhook]
-  H --> E
+  C --> D[Authenticated n8n webhooks]
+  D --> E[(PostgreSQL)]
+  C --> F[QR SVG token]
+  G[Staff QR scanner] --> C
 ```
 
-Vercel handles public web requests, minimal input validation, QR rendering and the staff authorization check and webhook-to-webhook authentication. n8n handles orchestration and NocoBase access. The NocoBase API key is held in n8n credentials, **never** sent to the browser or committed to GitHub.
+**Responsibility split:** Vercel serves the interface and API, n8n orchestrates the workflows, and PostgreSQL stores events, registrations and attendance. The database is **not** connected directly to the visitor's browser.
 
-## Project files
+## Project structure
 
-| Path | Purpose |
-| --- | --- |
-| [index.html](./index.html) | Registration and check-in user interface |
-| [app.js](./app.js) | Frontend interactions and camera QR detection |
-| [styles.css](./styles.css) | Responsive visual design |
-| [api/register.js](./api/register.js) | Vercel registration proxy |
-| [api/checkin.js](./api/checkin.js) | Staff-gated Vercel check-in proxy |
-| [api/qr.js](./api/qr.js) | On-demand server-side QR SVG rendering |
-| [n8n/register.json](./n8n/register.json) | Registration workflow template |
-| [n8n/checkin.json](./n8n/checkin.json) | Check-in workflow template |
-| [docs/SETUP.md](./docs/SETUP.md) | Database model, setup and limitations |
+```text
+projects/eventflow-qr/
+├── api/                 # Vercel registration, check-in and QR endpoints
+├── db/
+│   ├── schema.sql       # PostgreSQL tables and constraints
+│   ├── seed.demo.sql    # Fictional DEMO-2026 event
+│   └── smoke-checks.sql # Safe schema inspection queries
+├── n8n/
+│   ├── register.json    # Registration to PostgreSQL
+│   └── checkin.json     # Check-in to PostgreSQL
+├── docs/
+│   └── SETUP.md         # Installation, architecture and tests
+├── index.html           # Registration and staff UI
+├── app.js               # Client interaction, camera and QR
+├── styles.css
+├── package.json
+└── .env.example
+```
 
-## Running the frontend
+## Quick start
 
-1. Copy this folder into its **own Git repository** or set it as the **Vercel Root Directory**. This repository also acts as the author's GitHub profile, so the project is under `projects/eventflow-qr/`.
-2. Install Node.js dependencies with `npm install` and run `npx vercel dev` (Vercel CLI required).
-3. Configure server-only variables using [`.env.example`](./.env.example). Never commit `.env` or `.env.local`.
-4. Configure Header Auth on both n8n webhooks using `x-eventflow-secret` and the dedicated `N8N_WEBHOOK_SHARED_KEY` configured in Vercel.
-5. Create NocoBase collections and import the n8n workflows following [setup instructions](./docs/SETUP.md).
-6. Configure real webhook URLs and the staff key before enabling the check-in workflow.
+1. Create an isolated PostgreSQL database and run [`db/schema.sql`](./db/schema.sql), then [`db/seed.demo.sql`](./db/seed.demo.sql).
+2. Import both workflow JSON files into your own n8n instance. Attach a **least-privileged Postgres credential** to both database nodes.
+3. Attach **Header Auth credentials** to each n8n webhook using your own `x-eventflow-secret`.
+4. Set Vercel's project **Root Directory** to `projects/eventflow-qr`. Install dependencies with `npm install` and run `npx vercel dev`.
+5. Configure all four server variables from [`.env.example`](./.env.example).
+6. Test registration, QR validation and duplicates with fictional attendee data before activating webhooks.
 
-The UI expects a demo event such as `DEMO-2026`; this is a **fictional placeholder**. No real attendee records are supplied.
+See [**complete setup, SQL model and security checks**](./docs/SETUP.md).
 
-## Request/response contract
+## Example API
 
-Registration: `POST /api/register`
+`POST /api/register`
 
 ```json
 {"eventId":"DEMO-2026","name":"Alex Rivera","email":"alex@example.org","consent":true}
 ```
 
-Returns `{"ok":true,"ticket":"<random UUID>"}` after successful persistence.
+After a successful DB insert, the API responds with `{"ok":true,"ticket":"<random UUID>"}`.
 
-Check-in: `POST /api/checkin` with `x-staff-key` header
+`POST /api/checkin` with the required staff token in the `x-staff-key` header:
 
 ```json
-{"eventId":"DEMO-2026","ticket":"<ticket UUID>"}
+{"eventId":"DEMO-2026","ticket":"<UUID from registration>"}
 ```
 
-Expected workflow response: `{"ok":true,"status":"checked_in"}`. Invalid/duplicate tickets require explicit error handling and database uniqueness controls before production use.
+Successful response: `{"ok":true,"status":"checked_in"}`. A duplicate check-in returns 409, and a ticket unknown to the event returns 404.
 
-## Security and publication boundaries
+## Data integrity and security
 
-- No private workflow exports, tenant identifiers, participant records, internal addresses or credentials.
-- No sensitive identity data in QR payloads: the QR contains a random ticket token.
-- Server-side API keys and staff keys only in environment variables / n8n credentials.
-- Vercel-to-n8n requests use a separate shared header secret to prevent bypassing staff authorization by calling n8n directly.
-- Staff check-in uses a shared secret for this demo. Use proper identity, roles, rate limits and auditing in production.
-- Add uniqueness constraints for registrations and check-ins to prevent concurrency-related duplicates.
-- Do not use with personal data until privacy, retention, consent and deletion policies are reviewed.
+- **Duplicate registration:** PostgreSQL unique index on event and normalized email.
+- **Repeated check-in:** composite primary key on event and QR token.
+- **Invalid ticket:** foreign key to the registration for the same event.
+- **SQL injection:** parameterized PostgreSQL queries using `$1::jsonb`.
+- **Secrets:** only in server-side configuration and n8n credentials; never in GitHub.
+- **Privacy:** QR tokens contain no personal details; demo data is fictional.
 
-**License:** No license is included at this stage; all rights reserved until an explicit license is selected.
+This portfolio implementation is not a substitute for a full production security review or data protection measures. A staff shared secret is intended only for the demonstration; production needs role-based authentication, abuse protection and auditing.
+
+**License:** No license has been granted for reuse beyond applicable law.
