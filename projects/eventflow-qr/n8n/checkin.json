@@ -1,261 +1,67 @@
 {
-  "name": "EventFlow QR — Check-in (portfolio template)",
+  "name": "EventFlow QR - Check-in (PostgreSQL)",
   "nodes": [
     {
-      "id": "check-in-webhook",
+      "id": "checkin-webhook",
       "name": "Check-in webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        120,
-        300
+        240,
+        260
       ],
       "parameters": {
         "httpMethod": "POST",
         "path": "eventflow-checkin",
         "responseMode": "responseNode",
-        "options": {},
-        "authentication": "headerAuth"
-      }
-    },
-    {
-      "id": "find-ticket",
-      "name": "Find ticket",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        340,
-        300
-      ],
-      "parameters": {
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "method": "GET",
-        "url": "={{ $env.NOCOBASE_URL + '/api/eventflow_registrations:list' }}",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "filter",
-              "value": "={{ JSON.stringify({ $and: [{ eventId: $('Check-in webhook').first().json.body.eventId }, { qrToken: $('Check-in webhook').first().json.body.ticket }] }) }}"
-            },
-            {
-              "name": "pageSize",
-              "value": "1"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "evaluate-ticket",
-      "name": "Evaluate ticket",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        560,
-        300
-      ],
-      "parameters": {
-        "jsCode": "const rows = $input.first().json.data;\nreturn [{ json: { ticketExists: Array.isArray(rows) && rows.length === 1 } }];"
-      }
-    },
-    {
-      "id": "ticket-found-",
-      "name": "Ticket found?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        780,
-        300
-      ],
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "combinator": "and",
-          "conditions": [
-            {
-              "id": "ticket-found",
-              "leftValue": "={{ $json.ticketExists }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true"
-              }
-            }
-          ]
-        },
+        "authentication": "headerAuth",
         "options": {}
       }
     },
     {
-      "id": "invalid-ticket",
-      "name": "Invalid ticket",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.4,
+      "id": "checkin-postgres",
+      "name": "Record check-in atomically",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        1020,
-        480
+        530,
+        260
       ],
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\"ok\":false,\"message\":\"Ticket not found for this event.\"}",
+        "operation": "executeQuery",
+        "query": "WITH request AS (\n  SELECT data->>'eventId' AS event_id,\n         data->>'ticket' AS ticket_text\n  FROM (SELECT $1::jsonb AS data) x\n),\nnew_checkin AS (\n  INSERT INTO eventflow.checkins (event_id, qr_token)\n  SELECT r.event_id, g.qr_token\n  FROM request r\n  JOIN eventflow.registrations g ON g.event_id = r.event_id\n    AND g.qr_token::text = r.ticket_text\n  ON CONFLICT DO NOTHING\n  RETURNING qr_token\n)\nSELECT CASE\n  WHEN EXISTS (SELECT 1 FROM new_checkin) THEN 'checked_in'\n  WHEN EXISTS (\n    SELECT 1 FROM eventflow.checkins c\n    JOIN request r ON c.event_id = r.event_id AND c.qr_token::text = r.ticket_text\n  ) THEN 'already_checked_in'\n  ELSE 'invalid_ticket'\nEND AS status;",
         "options": {
-          "responseCode": 404
+          "queryReplacement": "={{ JSON.stringify($('Check-in webhook').first().json.body) }}"
         }
       }
     },
     {
-      "id": "find-existing-check-in",
-      "name": "Find existing check-in",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1020,
-        200
-      ],
-      "parameters": {
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "method": "GET",
-        "url": "={{ $env.NOCOBASE_URL + '/api/eventflow_checkins:list' }}",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "filter",
-              "value": "={{ JSON.stringify({ $and: [{ eventId: $('Check-in webhook').first().json.body.eventId }, { qrToken: $('Check-in webhook').first().json.body.ticket }] }) }}"
-            },
-            {
-              "name": "pageSize",
-              "value": "1"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "evaluate-existing-check-in",
-      "name": "Evaluate existing check-in",
+      "id": "checkin-response",
+      "name": "Map check-in result",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1250,
-        200
+        820,
+        260
       ],
       "parameters": {
-        "jsCode": "const rows = $input.first().json.data;\nreturn [{ json: { notCheckedIn: Array.isArray(rows) && rows.length === 0 } }];"
+        "jsCode": "const row = $input.first().json;\nif (row.status === 'checked_in') {\n  return [{json:{ok:true,status:'checked_in',httpStatus:200}}];\n}\nreturn [{ json: {\n  ok: false, status: row.status || 'invalid_ticket',\n  message: row.status === 'already_checked_in' ? 'Ticket has already been checked in.' : 'Ticket not found for this event.',\n  httpStatus: row.status === 'already_checked_in' ? 409 : 404\n}}];"
       }
     },
     {
-      "id": "new-check-in-",
-      "name": "New check-in?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        1480,
-        200
-      ],
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "combinator": "and",
-          "conditions": [
-            {
-              "id": "new-checkin",
-              "leftValue": "={{ $json.notCheckedIn }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true"
-              }
-            }
-          ]
-        },
-        "options": {}
-      }
-    },
-    {
-      "id": "duplicate-check-in",
-      "name": "Duplicate check-in",
+      "id": "checkin-reply",
+      "name": "Check-in response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        1710,
-        400
+        1090,
+        260
       ],
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\"ok\":false,\"message\":\"Ticket has already been checked in.\"}",
+        "responseBody": "={{ JSON.stringify($json) }}",
         "options": {
-          "responseCode": 409
-        }
-      }
-    },
-    {
-      "id": "create-check-in",
-      "name": "Create check-in",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1710,
-        100
-      ],
-      "parameters": {
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "method": "POST",
-        "url": "={{ $env.NOCOBASE_URL + '/api/eventflow_checkins:create' }}",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ eventId: $('Check-in webhook').first().json.body.eventId, qrToken: $('Check-in webhook').first().json.body.ticket, checkedInAt: new Date().toISOString() }) }}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "check-in-confirmed",
-      "name": "Check-in confirmed",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.4,
-      "position": [
-        1940,
-        100
-      ],
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\"ok\":true,\"status\":\"checked_in\"}",
-        "options": {
-          "responseCode": 200
+          "responseCode": "={{ $json.httpStatus }}"
         }
       }
     }
@@ -265,98 +71,29 @@
       "main": [
         [
           {
-            "node": "Find ticket",
+            "node": "Record check-in atomically",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Find ticket": {
+    "Record check-in atomically": {
       "main": [
         [
           {
-            "node": "Evaluate ticket",
+            "node": "Map check-in result",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Evaluate ticket": {
+    "Map check-in result": {
       "main": [
         [
           {
-            "node": "Ticket found?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ticket found?": {
-      "main": [
-        [
-          {
-            "node": "Find existing check-in",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Invalid ticket",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Find existing check-in": {
-      "main": [
-        [
-          {
-            "node": "Evaluate existing check-in",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Evaluate existing check-in": {
-      "main": [
-        [
-          {
-            "node": "New check-in?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "New check-in?": {
-      "main": [
-        [
-          {
-            "node": "Create check-in",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Duplicate check-in",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create check-in": {
-      "main": [
-        [
-          {
-            "node": "Check-in confirmed",
+            "node": "Check-in response",
             "type": "main",
             "index": 0
           }
