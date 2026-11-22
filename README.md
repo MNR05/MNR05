@@ -64,6 +64,19 @@ My work combines **technical implementation** with a practical approach to requi
 
 📚 [Read the technical project overview](./docs/PROJECTS.md)
 
+### 🧪 Engineering mini-project collections
+
+Small, documented projects for practicing problem-solving, data handling and software design. Each collection includes examples and automated checks.
+
+| Language / area | Mini-projects |
+| --- | --- |
+| **[Python](https://github.com/MNR05/Python)** | CSV Insights · Duplicate Finder · Expense Ledger (SQLite) |
+| **[JavaScript](https://github.com/MNR05/Dev-Web)** | Webhook HMAC · Task Manager CLI · API Log Insights |
+| **[C#](https://github.com/MNR05/CSharp)** | Inventory Tracker · Sliding Window Rate Limiter |
+| **[Java](https://github.com/MNR05/Java)** | LRU Cache · Event Capacity Manager |
+
+*These examples were added in 2026. The original repositories may be older; I preserve actual Git history instead of assigning earlier dates to new code.*
+
 ### 🎯 Currently exploring
 
 - Scalable automation and low-code application development
