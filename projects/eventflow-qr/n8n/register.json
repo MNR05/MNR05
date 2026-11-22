@@ -1,0 +1,94 @@
+{
+  "name": "EventFlow QR — Register (portfolio template)",
+  "nodes": [
+    {
+      "id": "registration-webhook",
+      "name": "Registration webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eventflow-register",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "create-registration",
+      "name": "Create registration",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "method": "POST",
+        "url": "={{ $env.NOCOBASE_URL + '/api/eventflow_registrations:create' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ eventId: $('Registration webhook').first().json.body.eventId, name: $('Registration webhook').first().json.body.name, email: $('Registration webhook').first().json.body.email, consent: true, qrToken: $('Registration webhook').first().json.body.ticket }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "registration-confirmed",
+      "name": "Registration confirmed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, ticket: $('Registration webhook').first().json.body.ticket }) }}",
+        "options": {
+          "responseCode": 201
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Registration webhook": {
+      "main": [
+        [
+          {
+            "node": "Create registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create registration": {
+      "main": [
+        [
+          {
+            "node": "Registration confirmed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "tags": []
+}
