@@ -31,7 +31,7 @@ flowchart LR
   H --> E
 ```
 
-Vercel handles public web requests, minimal input validation, QR rendering and the staff authorization check. n8n handles orchestration and NocoBase access. The NocoBase API key is held in n8n credentials, **never** sent to the browser or committed to GitHub.
+Vercel handles public web requests, minimal input validation, QR rendering and the staff authorization check and webhook-to-webhook authentication. n8n handles orchestration and NocoBase access. The NocoBase API key is held in n8n credentials, **never** sent to the browser or committed to GitHub.
 
 ## Project files
 
@@ -52,8 +52,9 @@ Vercel handles public web requests, minimal input validation, QR rendering and t
 1. Copy this folder into its **own Git repository** or set it as the **Vercel Root Directory**. This repository also acts as the author's GitHub profile, so the project is under `projects/eventflow-qr/`.
 2. Install Node.js dependencies with `npm install` and run `npx vercel dev` (Vercel CLI required).
 3. Configure server-only variables using [`.env.example`](./.env.example). Never commit `.env` or `.env.local`.
-4. Create NocoBase collections and import the n8n workflows following [setup instructions](./docs/SETUP.md).
-5. Configure real webhook URLs and the staff key before enabling the check-in workflow.
+4. Configure Header Auth on both n8n webhooks using `x-eventflow-secret` and the dedicated `N8N_WEBHOOK_SHARED_KEY` configured in Vercel.
+5. Create NocoBase collections and import the n8n workflows following [setup instructions](./docs/SETUP.md).
+6. Configure real webhook URLs and the staff key before enabling the check-in workflow.
 
 The UI expects a demo event such as `DEMO-2026`; this is a **fictional placeholder**. No real attendee records are supplied.
 
@@ -80,6 +81,7 @@ Expected workflow response: `{"ok":true,"status":"checked_in"}`. Invalid/duplica
 - No private workflow exports, tenant identifiers, participant records, internal addresses or credentials.
 - No sensitive identity data in QR payloads: the QR contains a random ticket token.
 - Server-side API keys and staff keys only in environment variables / n8n credentials.
+- Vercel-to-n8n requests use a separate shared header secret to prevent bypassing staff authorization by calling n8n directly.
 - Staff check-in uses a shared secret for this demo. Use proper identity, roles, rate limits and auditing in production.
 - Add uniqueness constraints for registrations and check-ins to prevent concurrency-related duplicates.
 - Do not use with personal data until privacy, retention, consent and deletion policies are reviewed.
