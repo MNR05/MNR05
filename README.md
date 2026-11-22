@@ -56,7 +56,7 @@ My work combines **technical implementation** with a practical approach to requi
 
 | Project | Description | Technologies |
 | --- | --- | --- |
-| **[EventFlow QR — Registration & Check-in](./projects/eventflow-qr/)** | Privacy-safe, independently rebuilt event registration and QR check-in starter with frontend, API endpoints and n8n workflow templates. **Requires setup and testing.** | Vercel · n8n · NocoBase · JavaScript |
+| **[EventFlow QR — Registration & Check-in](./projects/eventflow-qr/)** | Privacy-safe QR registration and check-in starter using a PostgreSQL schema, Vercel APIs and n8n workflows. **Requires setup and testing.** | Vercel · n8n · PostgreSQL · JavaScript |
 | **[IoT Monitoring Prototype](https://github.com/MNR05/System-of-monitoring-crops-with-EP8266)** | Sensor readings and telemetry exploration using an ESP8266 microcontroller. | ESP8266 · Arduino/C++ · Azure IoT |
 | **[Sales Management System](https://github.com/MNR05/Sistema-de-venta-Licoreria)** | Academic desktop application with layered architecture for products, users and roles. | C# · SQL Server |
 | **[Multi-page Website](https://github.com/MNR05/PW_Jutmay)** | Website with multiple service pages and landing pages. | HTML · CSS · JavaScript |
