@@ -4,6 +4,20 @@ This document helps readers understand the public repositories featured on my [G
 
 > **Scope:** Public projects include academic, experimental and web-development work. Their presence here does not imply production deployment, active maintenance or quantified business outcomes. For accurate setup steps, refer to each repository's source and documentation.
 
+## EventFlow QR — event registration & check-in starter
+
+**Source:** [EventFlow QR](../projects/eventflow-qr/)
+
+**What it demonstrates**
+- A clean, independently rewritten registration and check-in flow using Vercel functions.
+- Random QR ticket tokens, staff-controlled access, and a browser camera scanner with manual fallback.
+- n8n workflow templates with NocoBase collection API interactions.
+- A privacy-first configuration model that excludes personal data and institutional integrations.
+
+**Status:** Portfolio code starter. Requires configuration and end-to-end testing with a separate n8n and NocoBase instance; not yet a deployed public service.
+
+**Read more:** [Project README](../projects/eventflow-qr/README.md) · [Setup and security notes](../projects/eventflow-qr/docs/SETUP.md)
+
 ## 1. ESP8266 IoT monitoring prototype
 
 **Repository:** [System-of-monitoring-crops-with-EP8266](https://github.com/MNR05/System-of-monitoring-crops-with-EP8266)
