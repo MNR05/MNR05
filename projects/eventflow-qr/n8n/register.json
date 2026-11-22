@@ -1,63 +1,67 @@
 {
-  "name": "EventFlow QR — Register (portfolio template)",
+  "name": "EventFlow QR - Registration (PostgreSQL)",
   "nodes": [
     {
-      "id": "registration-webhook",
+      "id": "register-webhook",
       "name": "Registration webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        220,
-        300
+        240,
+        260
       ],
       "parameters": {
         "httpMethod": "POST",
         "path": "eventflow-register",
         "responseMode": "responseNode",
-        "options": {},
-        "authentication": "headerAuth"
+        "authentication": "headerAuth",
+        "options": {}
       }
     },
     {
-      "id": "create-registration",
-      "name": "Create registration",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "id": "register-postgres",
+      "name": "Save registration atomically",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        500,
-        300
+        530,
+        260
       ],
       "parameters": {
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "method": "POST",
-        "url": "={{ $env.NOCOBASE_URL + '/api/eventflow_registrations:create' }}",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ eventId: $('Registration webhook').first().json.body.eventId, name: $('Registration webhook').first().json.body.name, email: $('Registration webhook').first().json.body.email, consent: true, qrToken: $('Registration webhook').first().json.body.ticket }) }}",
+        "operation": "executeQuery",
+        "query": "WITH input AS (\n  SELECT $1::jsonb AS data\n),\nrequest AS (\n  SELECT\n    data->>'eventId' AS event_id,\n    btrim(data->>'name') AS full_name,\n    lower(btrim(data->>'email')) AS email,\n    data->>'ticket' AS ticket_text,\n    COALESCE(data->>'consent', 'false') = 'true' AS consent\n  FROM input\n),\ncreated AS (\n  INSERT INTO eventflow.registrations (event_id, full_name, email, qr_token, consent)\n  SELECT r.event_id, r.full_name, r.email, r.ticket_text::uuid, r.consent\n  FROM request r\n  JOIN eventflow.events e ON e.event_id = r.event_id AND e.registration_open\n  WHERE r.consent\n    AND length(r.full_name) BETWEEN 2 AND 120\n    AND length(r.email) BETWEEN 3 AND 254\n    AND r.email ~* '^[^[:space:]@]+@[^[:space:]@]+[.][^[:space:]@]+$'\n    AND r.ticket_text ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'\n  ON CONFLICT DO NOTHING\n  RETURNING qr_token\n)\nSELECT\n  CASE\n    WHEN EXISTS (SELECT 1 FROM created) THEN 'registered'\n    WHEN NOT EXISTS (SELECT 1 FROM eventflow.events e JOIN request r ON e.event_id = r.event_id) THEN 'unknown_event'\n    WHEN EXISTS (SELECT 1 FROM eventflow.events e JOIN request r ON e.event_id = r.event_id WHERE NOT e.registration_open) THEN 'event_closed'\n    ELSE 'duplicate_or_invalid'\n  END AS status,\n  (SELECT qr_token::text FROM created LIMIT 1) AS ticket;",
         "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
+          "queryReplacement": "={{ JSON.stringify($('Registration webhook').first().json.body) }}"
         }
       }
     },
     {
-      "id": "registration-confirmed",
-      "name": "Registration confirmed",
+      "id": "register-response",
+      "name": "Map registration result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        820,
+        260
+      ],
+      "parameters": {
+        "jsCode": "const row = $input.first().json;\nconst messages = {\n  unknown_event: 'Event does not exist.',\n  event_closed: 'Registration is closed for this event.',\n  duplicate_or_invalid: 'Duplicate registration or invalid registration information.'\n};\nif (row.status === 'registered' && row.ticket) {\n  return [{ json: { ok: true, ticket: row.ticket, status: 'registered', httpStatus: 201 } }];\n}\nreturn [{ json: { ok: false, status: row.status || 'invalid', message: messages[row.status] || 'Registration was not completed.', httpStatus: row.status === 'duplicate_or_invalid' ? 409 : row.status === 'unknown_event' ? 404 : 400 } }];"
+      }
+    },
+    {
+      "id": "register-reply",
+      "name": "Registration response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        800,
-        300
+        1090,
+        260
       ],
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ ok: true, ticket: $('Registration webhook').first().json.body.ticket }) }}",
+        "responseBody": "={{ JSON.stringify($json) }}",
         "options": {
-          "responseCode": 201
+          "responseCode": "={{ $json.httpStatus }}"
         }
       }
     }
@@ -67,18 +71,29 @@
       "main": [
         [
           {
-            "node": "Create registration",
+            "node": "Save registration atomically",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create registration": {
+    "Save registration atomically": {
       "main": [
         [
           {
-            "node": "Registration confirmed",
+            "node": "Map registration result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map registration result": {
+      "main": [
+        [
+          {
+            "node": "Registration response",
             "type": "main",
             "index": 0
           }
