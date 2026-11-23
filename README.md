@@ -56,6 +56,7 @@ My work combines **technical implementation** with a practical approach to requi
 
 | Project | Description | Technologies |
 | --- | --- | --- |
+| **[E-commerce Analytics Dashboard](https://github.com/MNR05/Data-Analitycs/tree/main/projects/ecommerce-analytics)** | Reproducible Streamlit analytics dashboard: Olist public CSV support, clearly marked fictional demo, validated GMV, delivery KPIs, SQL and automated tests. **Not deployed yet.** | Python · Pandas · Streamlit · SQL |
 | **[EventFlow QR — Registration & Check-in](./projects/eventflow-qr/)** | Privacy-safe QR registration and check-in starter using a PostgreSQL schema, Vercel APIs and n8n workflows. **Requires setup and testing.** | Vercel · n8n · PostgreSQL · JavaScript |
 | **[IoT Monitoring Prototype](https://github.com/MNR05/System-of-monitoring-crops-with-EP8266)** | Sensor readings and telemetry exploration using an ESP8266 microcontroller. | ESP8266 · Arduino/C++ · Azure IoT |
 | **[Sales Management System](https://github.com/MNR05/Sistema-de-venta-Licoreria)** | Academic desktop application with layered architecture for products, users and roles. | C# · SQL Server |
